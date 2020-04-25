@@ -1,4 +1,4 @@
-@login
+ @login
 Feature: Login
   As user, I want to be able to login with username and password
 #  Agile story
@@ -28,3 +28,18 @@ Feature: Login
   Scenario: Login with parameters
     When user enters "salesmanager115" username and "UserUser123" password
     Then user should verify that title is a Dashboard
+
+    @scenario_outline
+    Scenario Outline: User name test for user <name>
+      When user enters "<username>" username and "<password>" password
+      Then user name should be "<name>"
+
+      Examples: credentials
+        | username        | password    | name             |
+        | user187         | UserUser123 | Jerel Vandervort |
+        | user200         | UserUser123 | Lonzo Leuschke   |
+        | storemanager52  | UserUser123 | Roma Medhurst    |
+        | storemanager66  | UserUser123 | Carlos Ernser    |
+        | salesmanager125 | UserUser123 | Cleveland Heller |
+        | salesmanager140 | UserUser123 | Jameson Paucek   |
+

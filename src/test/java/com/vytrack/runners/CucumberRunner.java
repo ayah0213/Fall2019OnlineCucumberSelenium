@@ -1,5 +1,6 @@
 package com.vytrack.runners;
 
+
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
@@ -10,7 +11,7 @@ import org.junit.runner.RunWith;
         features = "src/test/resources/features",
         dryRun = false,
         strict = false,
-        tags = "@create_car",
+        tags = "@create_car_ddt",
         plugin = {
                 "html:target/default-report",
                 "json:target/cucumber1.json"
