@@ -7,14 +7,12 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         glue = "com/vytrack/step_definitions",
-        features = "@target/rerun.txt",// will generate list of failed test scenarios
+        features = "@target/rerun.txt",
         plugin = {
                 "html:target/failed-default-report",
                 "json:target/failed_report.json",
-
         }
 
 )
-
 public class FailedRunner {
 }
