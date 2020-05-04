@@ -10,15 +10,15 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import javax.security.auth.login.Configuration;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Driver {
 
+
     //same for everyone
     private static ThreadLocal<WebDriver> driverPool = new ThreadLocal<>();
-
-    private static ChromeOptions chromeOptions;
 
     //so no one can create object of Driver class
     //everyone should call static getter method instead
@@ -26,8 +26,9 @@ public class Driver {
 
     }
 
-    /**synchronized makes method thread safe. It ensures that only 1 thread can use it at the time.
-     *
+    /**
+     * synchronized makes method thread safe. It ensures that only 1 thread can use it at the time.
+     * <p>
      * Thread safety reduces performance but it makes everything safe.
      *
      * @return
@@ -38,6 +39,11 @@ public class Driver {
         if (driverPool.get() == null) {
             //specify browser type in configuration.properties file
             String browser = ConfigurationReader.getProperty("browser").toLowerCase();
+            // -Dbrowser=firefox
+            if (System.getProperty("browser") != null) {
+                browser = System.getProperty("browser");
+            }
+
             switch (browser) {
                 case "chrome":
                     WebDriverManager.chromedriver().setup();
@@ -52,6 +58,24 @@ public class Driver {
                     options.setHeadless(true);
                     driverPool.set(new ChromeDriver(options));
                     break;
+                case "chrome-remote":
+                    try {
+                        //we create object of URL and specify
+                        //selenium grid hub as a parameter
+                        //make sure it ends with /wd/hub
+                        URL url = new URL("http://34.236.36.95:4444/wd/hub");
+                        //desiredCapabilities used to specify what kind of node
+                        //is required for testing
+                        //such as: OS type, browser, version, etc...
+                        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+                        desiredCapabilities.setBrowserName(BrowserType.CHROME);
+                        desiredCapabilities.setPlatform(Platform.ANY);
+
+                        driverPool.set(new RemoteWebDriver(url, desiredCapabilities));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 case "firefox":
                     WebDriverManager.firefoxdriver().setup();
                     driverPool.set(new FirefoxDriver());
@@ -63,13 +87,14 @@ public class Driver {
         return driverPool.get();
     }
 
-    /**synchronized makes method thread safe. It ensures that only 1 thread can use it at the time.
-     *
+    /**
+     * synchronized makes method thread safe. It ensures that only 1 thread can use it at the time.
+     * <p>
      * Thread safety reduces performance but it makes everything safe.
      *
      * @return
      */
-    public synchronized static WebDriver getDriver(String browser) throws MalformedURLException {
+    public synchronized static WebDriver getDriver(String browser) {
         //if webdriver object doesn't exist
         //create it
         if (driverPool.get() == null) {
@@ -81,13 +106,6 @@ public class Driver {
                     chromeOptions.addArguments("--start-maximized");
                     driverPool.set(new ChromeDriver(chromeOptions));
                     break;
-                case "remote-chrome":
-                    URL url = new URL("http://3.91.12.53:4444/wd/hub");
-                    DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-                    desiredCapabilities.setBrowserName(BrowserType.CHROME);
-                    desiredCapabilities.setPlatform(Platform.ANY);
-                    driverPool.set(new RemoteWebDriver(url, desiredCapabilities));
-
                 case "chromeheadless":
                     //to run chrome without interface (headless mode)
                     WebDriverManager.chromedriver().version("79").setup();
